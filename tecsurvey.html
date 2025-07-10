@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Site Survey</title>
+    
+    <meta name="theme-color" content="#2563EB"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" xintegrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .form-section {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .form-label {
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            display: block;
+            font-size: 0.875rem;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            border: 1px solid #D1D5DB;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            font-size: 1rem;
+            color: #1F2937;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #2563EB;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+        .btn-primary {
+            background-color: #2563EB;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1D4ED8;
+        }
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+        .btn-success {
+            background-color: #16a34a;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #15803d;
+        }
+        .btn-warning {
+            background-color: #f59e0b;
+            color: white;
+        }
+        .btn-warning:hover {
+            background-color: #d97706;
+        }
+        .btn-danger {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+        .btn-danger:hover {
+            background-color: #fecaca;
+            color: #991b1b;
+        }
+        .btn-link {
+            color: #2563EB;
+            text-decoration: underline;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+        }
+        .signature-pad {
+            border: 2px dashed #D1D5DB;
+            border-radius: 0.5rem;
+            cursor: crosshair;
+            touch-action: none;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: white;
+            flex-direction: column;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fff;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Adicionado para tentar remover o cabeçalho e rodapé do navegador na impressão */
+        @page {
+            size: auto;
+            margin: 1cm; /* Você pode ajustar esta margem conforme necessário */
+        }
+
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print { display: none !important; }
+            #main-form-container { display: none !important; }
+            #print-output { display: block !important; }
+            .report-section { page-break-inside: avoid; }
+            .report-photo-gallery, .report-map-gallery { page-break-inside: avoid; }
+            .report-photo-gallery img {
+                border: 1px solid #ccc;
+                max-width: 48%; 
+                height: auto;
+                display: inline-block;
+                margin: 5px;
+                vertical-align: top;
+            }
+            .report-map-gallery img {
+                max-width: 100%;
+                height: auto;
+                border: 1px solid #ccc;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 sm:p-6 lg:p-8">
+
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p id="loading-text" class="mt-4 text-lg">Gerando relatório...</p>
+    </div>
+
+    <div id="main-form-container" class="max-w-4xl mx-auto">
+        <header class="report-header bg-white p-0 overflow-hidden border border-gray-400 rounded-lg mb-6">
+            <table class="w-full">
+                <tbody>
+                    <tr class="divide-x divide-gray-300">
+                        <td class="w-1/3 p-2 align-middle text-center">
+                            <img id="logo-img" src="TEC_ARSA.png" alt="Logo da Empresa" class="h-12 mx-auto" onerror="this.onerror=null;this.src='https://placehold.co/200x60/ffffff/e0e0e0?text=Logo';">
+                        </td>
+                        <td class="w-1/3 p-2 align-middle text-center">
+                            <h1 class="text-2xl font-bold text-gray-800 uppercase">Site Survey</h1>
+                        </td>
+                        <td class="w-1/3 p-2 align-middle text-center text-lg">
+                            <p><strong id="docDate"></strong></p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </header>
+
+        <form id="siteSurveyForm">
+            <div class="form-section">
+                <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">1. Informações Gerais</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="company" class="form-label">Empresa Executora</label>
+                        <select id="company" name="company" class="form-select">
+                            <option value="tecpoint">Tecpoint</option>
+                            <option value="arsa">ARSA</option>
+                        </select>
+                    </div>
+                    <div><label for="surveyDate" class="form-label">Data da Visita</label><input type="date" id="surveyDate" name="surveyDate" class="form-input"></div>
+                    <div><label for="docNumber" class="form-label">Nº do Documento</label><input type="text" id="docNumber" name="docNumber" class="form-input bg-gray-100" readonly></div>
+                    <div><label for="siteName" class="form-label">Nome do Site</label><input type="text" id="siteName" name="siteName" class="form-input" placeholder="Ex: Torre Cerro Azul"></div>
+                    <div class="md:col-span-2"><label for="surveyorName" class="form-label">Técnico Responsável</label><input type="text" id="surveyorName" name="surveyorName" class="form-input" placeholder="Seu nome"></div>
+                    <div><label for="clientName" class="form-label">Cliente</label><input type="text" id="clientName" name="clientName" class="form-input" placeholder="Nome da empresa cliente"></div>
+                    <div><label for="clientContact" class="form-label">Contato do Cliente no Local</label><input type="text" id="clientContact" name="clientContact" class="form-input" placeholder="Nome de quem acompanha a visita"></div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">2. Localização e Infraestrutura</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    <div class="md:col-span-2"><label for="address" class="form-label">Endereço</label><input type="text" id="address" name="address" class="form-input" placeholder="Rua, número, cidade, estado"></div>
+                    
+                    <div class="md:col-span-2">
+                        <label class="form-label">Coordenadas Geográficas</label>
+                        <div class="flex items-center gap-4">
+                            <div class="flex-grow"><input type="text" id="latitude" name="latitude" class="form-input" placeholder="Latitude"></div>
+                            <div class="flex-grow"><input type="text" id="longitude" name="longitude" class="form-input" placeholder="Longitude"></div>
+                            <button type="button" id="getCoordsBtn" class="btn btn-secondary btn-sm no-print" title="Obter coordenadas do GPS">
+                                <i class="fa-solid fa-location-crosshairs mr-2"></i> GPS
+                            </button>
+                        </div>
+                    </div>
+
+                    <div><label for="powerSource" class="form-label">Fonte de Energia Principal</label><select id="powerSource" name="powerSource" class="form-select"><option value="">Selecione uma opção</option><option value="concessionaria_ac">Concessionária (AC)</option><option value="gerador">Gerador</option><option value="solar">Sistema Solar</option><option value="banco_baterias_dc">Banco de Baterias (DC)</option><option value="sem_energia">Sem energia no local</option></select></div>
+                    <div><label for="voltage" class="form-label">Voltagem Medida (V)</label><input type="number" id="voltage" name="voltage" class="form-input" step="any" placeholder="Ex: 127.5"></div>
+                    
+                    <div class="md:col-span-2 flex items-center gap-4 pt-2">
+                        <label class="flex items-center space-x-2"><input type="checkbox" id="hasRedundantPower" name="hasRedundantPower" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"><span class="text-sm font-medium text-gray-700">Possui energia redundante</span></label>
+                    </div>
+
+                    <div id="redundantPowerSection" class="hidden md:col-span-2">
+                         <label for="redundantPowerSource" class="form-label">Fonte de Energia Redundante</label>
+                         <select id="redundantPowerSource" name="redundantPowerSource" class="form-select">
+                            <option value="">Selecione a fonte redundante</option>
+                            <option value="concessionaria_ac">Concessionária (AC)</option>
+                            <option value="gerador">Gerador</option>
+                            <option value="nobreak_online">Nobreak Online</option>
+                            <option value="solar">Sistema Solar com Baterias</option>
+                            <option value="banco_baterias_dc">Banco de Baterias (DC)</option>
+                         </select>
+                    </div>
+
+                    <div><label for="grounding" class="form-label">Sistema de Aterramento</label><select id="grounding" name="grounding" class="form-select"><option value="">Selecione uma opção</option><option value="ok">OK - Conforme norma</option><option value="melhoria">Precisa de Melhoria</option><option value="inexistente">Inexistente</option></select></div>
+                    <div><label for="groundingMeasurement" class="form-label">Medida de Aterramento (Ω)</label><input type="number" id="groundingMeasurement" name="groundingMeasurement" class="form-input" step="any" placeholder="Ex: 2.5"></div>
+                    
+                    <div>
+                        <label for="shelterType" class="form-label">Tipo de Abrigo para Equipamentos</label>
+                        <select id="shelterType" name="shelterType" class="form-select">
+                            <option value="">Selecione uma opção</option>
+                            <option value="abrigo_alvenaria">Abrigo de Alvenaria</option>
+                            <option value="rack_outdoor">Rack Outdoor</option>
+                            <option value="rack_poste">Rack de Poste</option>
+                            <option value="nao_possui">Não Possui Abrigo</option>
+                            <option value="outro">Outro (descrever em obs.)</option>
+                        </select>
+                    </div>
+                    <div><label for="equipmentSpace" class="form-label">Espaço para Equipamentos</label><input type="text" id="equipmentSpace" name="equipmentSpace" class="form-input" placeholder="Ex: Espaço para 1 rack 19, climatizado"></div>
+
+                    <div class="md:col-span-2 mt-4 pt-4 border-t"><h4 class="font-semibold text-gray-600 mb-3 text-base">Detalhamento da Estrutura de Instalação da Antena</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4"><div><label for="antennaStructureType" class="form-label">Tipo de Estrutura</label><select id="antennaStructureType" name="antennaStructureType" class="form-select"><option value="">Selecione o tipo</option><option value="torre_trelicada">Torre Metálica Treliçada</option><option value="torre_autoportante">Torre Metálica Autoportante</option><option value="poste_concreto">Poste de Concreto</option><option value="poste_metalico">Poste Metálico</option><option value="fachada_predio">Fachada de Prédio</option><option value="teto_cobertura">Teto / Cobertura</option></select></div><div><label for="structureHeight" class="form-label">Altura da Estrutura (m)</label><input type="number" id="structureHeight" name="structureHeight" class="form-input" step="any" placeholder="Ex: 30"></div><div><label for="antennaStructureCondition" class="form-label">Condição da Estrutura</label><select id="antennaStructureCondition" name="antennaStructureCondition" class="form-select"><option value="">Selecione a condição</option><option value="boa">Boa (sem danos visíveis)</option><option value="manutencao">Requer Manutenção (ferrugem, pintura)</option><option value="ruim">Ruim / Comprometida (danos estruturais)</option></select></div><div><label for="lifeline" class="form-label">Linha de Vida</label><select id="lifeline" name="lifeline" class="form-select"><option value="">Selecione a condição</option><option value="ok">OK e Inspecionada</option><option value="reparos">Existente, mas requer reparos</option><option value="inexistente">Requer Instalação</option></select></div><div><label for="beaconing" class="form-label">Sinalização Noturna (Balizamento)</label><select id="beaconing" name="beaconing" class="form-select"><option value="">Selecione a condição</option><option value="ok">OK e Funcional</option><option value="defeituoso">Defeituoso / Lâmpada queimada</option><option value="inexistente">Inexistente</option><option value="nao_aplicavel">Não Aplicável (baixa altura)</option></select></div><div class="md:col-span-2"><label for="structureObs" class="form-label">Observações da Estrutura</label><textarea id="structureObs" name="structureObs" rows="3" class="form-textarea" placeholder="Descreva pontos de ferrugem, parafusos, acesso à torre, necessidade de limpeza, etc."></textarea></div></div></div>
+                    
+                    <div class="md:col-span-2 mt-4">
+                        <label class="form-label">Fotos da Infraestrutura e Estrutura da Antena (máx. 5)</label>
+                        <label class="btn btn-secondary w-full flex items-center justify-center cursor-pointer">
+                            <i class="fa-solid fa-camera mr-2"></i>
+                            <span>Anexar / Tirar Foto</span>
+                            <input type="file" id="infraPhotos" name="infraPhotos" multiple class="hidden" accept="image/*" capture="environment">
+                        </label>
+                        <p id="infraPhotos-feedback" class="text-sm text-gray-500 mt-2">Nenhuma foto selecionada.</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">3. Análise de RF do Ambiente</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div><label for="frequencyBand" class="form-label">Banda de Frequência de Varredura</label><select id="frequencyBand" name="frequencyBand" class="form-select"><option value="VHF">VHF (136-174 MHz)</option><option value="UHF">UHF (403-527 MHz)</option></select></div>
+                    <div><label for="noiseFloor" class="form-label">Noise Floor do Local (dBm)</label><input type="number" id="noiseFloor" name="noiseFloor" class="form-input" step="any" placeholder="-110"></div>
+                    <div class="md:col-span-2"><label for="interferenceNotes" class="form-label">Fontes de Interferência Identificadas</label><textarea id="interferenceNotes" name="interferenceNotes" rows="3" class="form-textarea" placeholder="Descreva qualquer fonte de RF próxima (ex: torre de celular, rádio FM, outros repetidores)"></textarea></div>
+                    
+                    <div class="md:col-span-2 mt-4">
+                        <label class="form-label">Fotos da Análise de RF (Espectro, Equipamentos de Medição) (máx. 5)</label>
+                        <label class="btn btn-secondary w-full flex items-center justify-center cursor-pointer">
+                            <i class="fa-solid fa-camera mr-2"></i>
+                            <span>Anexar / Tirar Foto</span>
+                            <input type="file" id="rfPhotos" name="rfPhotos" multiple class="hidden" accept="image/*" capture="environment">
+                        </label>
+                        <p id="rfPhotos-feedback" class="text-sm text-gray-500 mt-2">Nenhuma foto selecionada.</p>
+                    </div>
+
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">4. Análise de Equipamentos</h2>
+                <div id="equipments-container" class="space-y-8"></div>
+                <div class="mt-6 text-right no-print"><button type="button" id="add-equipment-btn" class="btn btn-primary">Adicionar Equipamento</button></div>
+            </div>
+            
+            <div class="form-section">
+                <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">5. Teste de Campo em Pontos de Interesse</h2>
+                <div id="test-points-container" class="space-y-8"></div>
+                <div class="mt-6 text-right no-print"><button type="button" id="add-test-point-btn" class="btn btn-primary">Adicionar Ponto de Teste</button></div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">6. Observações Gerais e Recomendações</h2>
+                 <div><textarea id="observations" name="observations" rows="5" class="form-textarea" placeholder="Descreva as condições gerais do site, dificuldades de acesso, recomendações de equipamentos, etc."></textarea></div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">7. Aprovações e Assinaturas</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label class="form-label">Assinatura do Técnico Responsável</label>
+                        <div class="bg-gray-50 rounded-lg">
+                            <canvas id="techSignatureCanvas" class="signature-pad w-full h-40"></canvas>
+                        </div>
+                        <input type="hidden" name="techSignature" id="techSignatureInput">
+                        <div class="flex justify-between items-center mt-2">
+                            <div class="w-full border-t border-gray-400 mr-4"></div>
+                            <button type="button" id="clearTechSignature" class="btn-link text-sm no-print">Limpar</button>
+                        </div>
+                        <p id="techNameDisplay" class="text-center text-sm text-gray-700 mt-1"></p>
+                    </div>
+                    <div>
+                        <label class="form-label">Assinatura do Cliente</label>
+                        <div class="bg-gray-50 rounded-lg">
+                            <canvas id="clientSignatureCanvas" class="signature-pad w-full h-40"></canvas>
+                        </div>
+                        <input type="hidden" name="clientSignature" id="clientSignatureInput">
+                        <div class="flex justify-between items-center mt-2">
+                            <div class="w-full border-t border-gray-400 mr-4"></div>
+                            <button type="button" id="clearClientSignature" class="btn-link text-sm no-print">Limpar</button>
+                        </div>
+                        <p id="clientNameDisplay" class="text-center text-sm text-gray-700 mt-1"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap justify-between items-center gap-4 mt-8 no-print">
+                <div>
+                     <button type="button" id="clearFormBtn" class="btn btn-danger">
+                       Limpar Formulário
+                    </button>
+                </div>
+                <div class="flex flex-wrap justify-end gap-4">
+                    <button type="button" id="saveProgressBtn" class="btn btn-success">
+                        <i class="fa-solid fa-floppy-disk mr-2"></i>
+                        Salvar Progresso
+                    </button>
+                    <button type="button" id="loadProgressBtn" class="btn btn-warning">
+                        <i class="fa-solid fa-upload mr-2"></i>
+                        Carregar Progresso
+                    </button>
+                    <input type="file" id="loadProgressInput" class="hidden" accept=".json">
+
+                    <button type="button" id="generateReportBtn" class="btn btn-primary">
+                        <i class="fa-solid fa-file-invoice mr-2"></i>
+                        Gerar Relatório
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div id="print-output" class="hidden"></div>
+
+    <template id="equipment-template">
+        <div class="equipment-block border border-gray-300 rounded-lg p-4 relative bg-gray-50/50">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-lg font-bold text-blue-700">Equipamento <span class="equipment-number">1</span></h3>
+                <button type="button" class="remove-btn btn btn-danger p-1 h-7 w-7 flex items-center justify-center no-print" title="Remover">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <div class="p-3 border rounded-md bg-white">
+                    <h4 class="font-semibold text-gray-600 mb-3 text-sm">Identificação do Equipamento</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="form-label">Tipo de Equipamento</label>
+                            <select data-name="equipmentType" class="form-select">
+                                <option value="repetidora">Repetidora</option>
+                                <option value="radio_fixo">Rádio Fixo</option>
+                                <option value="radio_movel">Rádio Móvel</option>
+                                <option value="radio_portatil">Rádio Portátil</option>
+                            </select>
+                        </div>
+                        <div><label class="form-label">ID / Nome do Equipamento</label><input type="text" data-name="equipmentName" class="form-input" placeholder="Ex: RPT-01-SEDE"></div>
+                        <div><label class="form-label">Modelo</label><input type="text" data-name="model" class="form-input" placeholder="Ex: SLR5700"></div>
+                        <div><label class="form-label">Nº de Série</label><input type="text" data-name="serialNumber" class="form-input" placeholder="Ex: 123ABC456"></div>
+                    </div>
+                </div>
+                <div class="p-3 border rounded-md bg-white">
+                    <h4 class="font-semibold text-gray-600 mb-3 text-sm">Sistema Irradiante</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div><label class="form-label">Tipo de Antena</label><input type="text" data-name="antennaType" class="form-input" placeholder="Ex: Dipolo 3dB"></div>
+                        <div><label class="form-label">Altura Antena (m)</label><input type="number" step="any" data-name="antennaHeight" class="form-input" placeholder="30"></div>
+                        <div><label class="form-label">Tipo de Cabo</label><input type="text" data-name="cableType" class="form-input" placeholder="Ex: RGC-213"></div>
+                        <div><label class="form-label">Compr. Cabo (m)</label><input type="number" step="any" data-name="cableLength" class="form-input" placeholder="40"></div>
+                    </div>
+                </div>
+                <div class="p-3 border rounded-md bg-white">
+                    <h4 class="font-semibold text-gray-600 mb-3 text-sm">Medições de RF</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div><label class="form-label">Freq. TX (MHz)</label><input type="number" step="any" data-name="txFreq" class="form-input" placeholder="462.550"></div>
+                            <div><label class="form-label">Freq. RX (MHz)</label><input type="number" step="any" data-name="rxFreq" class="form-input" placeholder="467.550"></div>
+                        </div>
+                        <div><label class="form-label">Potência (W)</label><input type="number" step="any" data-name="power" class="form-input" placeholder="45"></div>
+                        <div><label class="form-label">Refletida (W)</label><input type="number" step="any" data-name="reflectedPower" class="form-input" placeholder="0.5"></div>
+                        <div><label class="form-label">ROE / VSWR</label><input type="text" data-name="vswr" class="form-input" placeholder="1.2:1"></div>
+                    </div>
+                </div>
+                 <div class="p-3 border rounded-md bg-white">
+                    <h4 class="font-semibold text-gray-600 mb-3 text-sm">Alimentação</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                        <div class="flex items-center gap-4 pt-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" data-name="hasPowerSupply" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="text-sm font-medium text-gray-700">Possui fonte de alimentação dedicada</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="form-label">Voltagem Medida na Fonte (V)</label>
+                            <input type="number" step="any" data-name="powerSupplyVoltage" class="form-input" placeholder="Ex: -48.5">
+                        </div>
+                    </div>
+                </div>
+                <div class="p-3 border rounded-md bg-white">
+                    <label class="form-label">Observações do Equipamento</label>
+                    <textarea data-name="equipmentObs" rows="2" class="form-textarea" placeholder="Descreva qualquer detalhe específico sobre a instalação, condição ou configuração deste equipamento."></textarea>
+                </div>
+                
+                <div class="p-3 border rounded-md bg-white">
+                    <label class="form-label">Fotos do Equipamento (máx. 5)</label>
+                    <label class="btn btn-secondary w-full flex items-center justify-center cursor-pointer">
+                        <i class="fa-solid fa-camera mr-2"></i>
+                        <span>Anexar / Tirar Foto</span>
+                        <input type="file" data-name="equipmentPhotos" multiple class="hidden" accept="image/*" capture="environment">
+                    </label>
+                    <p data-name="equipmentPhotos-feedback" class="text-sm text-gray-500 mt-2">Nenhuma foto selecionada.</p>
+                </div>
+
+            </div>
+        </div>
+    </template>
+    
+    <template id="test-point-template">
+        <div class="test-point-block border border-gray-300 rounded-lg p-4 relative bg-gray-50/50">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-lg font-bold text-green-700">Ponto de Teste <span class="test-point-number">1</span></h3>
+                <button type="button" class="remove-btn btn btn-danger p-1 h-7 w-7 flex items-center justify-center no-print" title="Remover">&times;</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="md:col-span-3"><label class="form-label">Local / Descrição do Ponto</label><input type="text" data-name="location" class="form-input" placeholder="Ex: Entrada do Armazém B, Escritório do Gerente"></div>
+                
+                <div class="md:col-span-3">
+                    <label class="form-label">Coordenadas do Ponto</label>
+                    <div class="flex items-center gap-4">
+                        <div class="flex-grow"><input type="text" data-name="latitude" class="form-input" placeholder="Latitude"></div>
+                        <div class="flex-grow"><input type="text" data-name="longitude" class="form-input" placeholder="Longitude"></div>
+                        <button type="button" data-action="getCoords" class="btn btn-secondary btn-sm no-print" title="Obter coordenadas do GPS">
+                            <i class="fa-solid fa-location-crosshairs mr-2"></i> GPS
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="form-label">Rádio Utilizado no Teste</label>
+                    <select data-name="testRadioType" class="form-select">
+                        <option value="">Selecione</option>
+                        <option value="portatil">Portátil</option>
+                        <option value="veicular">Veicular</option>
+                        <option value="fixo">Fixo</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">Potência (W)</label>
+                    <input type="number" step="any" data-name="testRadioPower" class="form-input" placeholder="5">
+                </div>
+                <div>
+                    <label class="form-label">Tipo de Antena</label>
+                    <input type="text" data-name="testRadioAntenna" class="form-input" placeholder="Ex: Heliflex">
+                </div>
+
+                <div><label class="form-label">Qualidade de Áudio (MOS)</label><select data-name="audioQuality" class="form-select"><option value="">Selecione</option><option value="5">5 - Excelente</option><option value="4">4 - Bom</option><option value="3">3 - Razoável</option><option value="2">2 - Ruim</option><option value="1">1 - Ininteligível</option></select></div>
+                <div><label class="form-label">RSSI (dBm)</label><input type="number" step="any" data-name="rssi" class="form-input" placeholder="-95"></div>
+                <div><label class="form-label">BER (%)</label><input type="number" step="any" data-name="ber" class="form-input" placeholder="1.5"></div>
+                <div class="md:col-span-3"><label class="form-label">Comunicação Testada</label><div class="flex items-center space-x-6 mt-2"><label class="flex items-center"><input type="checkbox" data-name="comm_duplex" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> <span class="ml-2 text-sm">Rádio para Repetidora (Duplex)</span></label><label class="flex items-center"><input type="checkbox" data-name="comm_simplex" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"> <span class="ml-2 text-sm">Rádio para Rádio (Simplex/Direto)</span></label></div></div>
+                <div class="md:col-span-3"><label class="form-label">Observações e Problemas Encontrados</label><textarea data-name="notes" rows="3" class="form-textarea" placeholder="Ex: Ponto cego dentro da estrutura metálica, áudio robotizado perto de painel elétrico, etc."></textarea></div>
+                
+                <div class="md:col-span-3">
+                    <label class="form-label">Fotos do Ponto de Teste (máx. 5)</label>
+                    <label class="btn btn-secondary w-full flex items-center justify-center cursor-pointer">
+                        <i class="fa-solid fa-camera mr-2"></i>
+                        <span>Anexar / Tirar Foto</span>
+                        <input type="file" data-name="testPointPhotos" multiple class="hidden" accept="image/*" capture="environment">
+                    </label>
+                    <p data-name="testPointPhotos-feedback" class="text-sm text-gray-500 mt-2">Nenhuma foto selecionada.</p>
+                </div>
+
+            </div>
+        </div>
+    </template>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Helpers
+            const getEl = (id) => document.getElementById(id);
+            const querySel = (selector) => document.querySelector(selector);
+            const querySelAll = (selector) => document.querySelectorAll(selector);
+            const FORM_STORAGE_KEY = 'siteSurveyFormData_v13'; 
+
+            // Chave da API do Google Maps
+            const Maps_API_KEY = "AIzaSyBV3sT-fZBTZ520hlwO2PYRlBtNqI2IelY";
+
+            // Dados das empresas
+            const companyData = {
+                tecpoint: {
+                    name: 'Tecpoint Soluções em Tecnologia',
+                    cnpj: '11.540.677/0001-39',
+                    address: 'Rua I, 105 Sala 17 - Ed. Eldorado Hill Office - Alvorada - Cuiabá - MT - 78048-487',
+                    logo: 'TEC.png'
+                },
+                arsa: {
+                    name: 'ARSA',
+                    cnpj: '26.554.923/0001-89',
+                    address: 'Rua São Joaquim, 726 - Centro-Sul - Cuiabá-MT - 78020-150',
+                    logo: 'arsa.png'
+                }
+            };
+
+            // --- FUNÇÕES DE LÓGICA DO FORMULÁRIO ---
+
+            const updateHeaderData = () => {
+                const surveyDateInput = getEl('surveyDate');
+                const docNumberInput = getEl('docNumber');
+
+                if (surveyDateInput.value) {
+                    const [year, month, day] = surveyDateInput.value.split('-');
+                    const formattedDate = day && month && year ? `${day}/${month}/${year}` : '';
+                    getEl('docDate').textContent = formattedDate;
+                    
+                    const docNumberValue = day && month && year ? `SS${year}${month}${day}CBA` : '';
+                    docNumberInput.value = docNumberValue;
+                } else {
+                    getEl('docDate').textContent = '';
+                    docNumberInput.value = '';
+                }
+            };
+
+            const updateCompanyLogo = () => {
+                const companySelect = getEl('company');
+                const selectedCompanyKey = companySelect.value;
+                const logoImg = getEl('logo-img');
+                if (companyData[selectedCompanyKey] && companyData[selectedCompanyKey].logo) {
+                    logoImg.src = companyData[selectedCompanyKey].logo;
+                } else {
+                    logoImg.src = 'https://placehold.co/200x60/ffffff/e0e0e0?text=Logo';
+                }
+            };
+            
+            const readFileAsDataURL = (file) => new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve({
+                    name: file.name,
+                    type: file.type,
+                    size: file.size,
+                    data: reader.result
+                });
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+
+            const getCoordinates = (latInput, lonInput, button) => {
+                if (!navigator.geolocation) {
+                    alert("Geolocalização não é suportada por este navegador.");
+                    return;
+                }
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Obtendo...';
+                button.disabled = true;
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        latInput.value = position.coords.latitude.toFixed(6);
+                        lonInput.value = position.coords.longitude.toFixed(6);
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                        latInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    },
+                    (error) => {
+                        let errorMsg = "Não foi possível obter a localização. ";
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED: errorMsg += "Permissão negada."; break;
+                            case error.POSITION_UNAVAILABLE: errorMsg += "Informação de localização indisponível."; break;
+                            case error.TIMEOUT: errorMsg += "A requisição expirou."; break;
+                            default: errorMsg += "Ocorreu um erro desconhecido."; break;
+                        }
+                        alert(errorMsg);
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            };
+
+            const saveFormStateToLocalStorage = () => {
+                const data = { staticFields: {}, equipments: [], testPoints: [] };
+                querySelAll('#siteSurveyForm [name]:not([type=file]):not([id*="Signature"])').forEach(el => {
+                    data.staticFields[el.name] = el.type === 'checkbox' ? el.checked : el.value;
+                });
+                querySelAll('.equipment-block').forEach(block => {
+                    const itemData = {};
+                    block.querySelectorAll('[data-name]').forEach(el => {
+                        if (el.type !== 'file') itemData[el.dataset.name] = el.type === 'checkbox' ? el.checked : el.value;
+                    });
+                    data.equipments.push(itemData);
+                });
+                querySelAll('.test-point-block').forEach(block => {
+                    const itemData = {};
+                    block.querySelectorAll('[data-name]').forEach(el => {
+                        if (el.type !== 'file') itemData[el.dataset.name] = el.type === 'checkbox' ? el.checked : el.value;
+                    });
+                    data.testPoints.push(itemData);
+                });
+                localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(data));
+            };
+
+            function loadFormStateFromLocalStorage() {
+                const savedData = localStorage.getItem(FORM_STORAGE_KEY);
+                if (!savedData) {
+                    initDynamicBlocks();
+                    getEl('surveyDate').valueAsDate = new Date();
+                } else {
+                    const data = JSON.parse(savedData);
+                    Object.keys(data.staticFields).forEach(name => {
+                        const el = querySel(`#siteSurveyForm [name="${name}"]`);
+                        if (el) {
+                            if (el.type === 'checkbox') {
+                                el.checked = data.staticFields[name];
+                            } else {
+                                el.value = data.staticFields[name];
+                            }
+                            el.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    });
+                    getEl('equipments-container').innerHTML = '';
+                    (data.equipments && data.equipments.length ? data.equipments : [{}]).forEach(d => addBlock('equipment', d));
+                    getEl('test-points-container').innerHTML = '';
+                    (data.testPoints && data.testPoints.length ? data.testPoints : [{}]).forEach(d => addBlock('test-point', d));
+                }
+                 updateHeaderData();
+                 updateCompanyLogo();
+            }
+
+            function addBlock(type, data = null) {
+                const container = getEl(type === 'equipment' ? 'equipments-container' : 'test-points-container');
+                const template = getEl(type === 'equipment' ? 'equipment-template' : 'test-point-template');
+                const clone = template.content.cloneNode(true);
+                const newBlock = clone.querySelector(`.${type}-block`);
+
+                const fileInput = newBlock.querySelector('input[type="file"]');
+                if (fileInput) {
+                    const feedbackEl = newBlock.querySelector(`[data-name="${fileInput.dataset.name}-feedback"]`);
+                    handlePhotoInput(fileInput, feedbackEl);
+                }
+
+                if (data) {
+                    newBlock.querySelectorAll('[data-name]').forEach(el => {
+                        const key = el.dataset.name;
+                        if (data[key] !== undefined && el.type !== 'file') {
+                            if (el.type === 'checkbox') el.checked = data[key];
+                            else el.value = data[key];
+                        }
+                    });
+                }
+                
+                newBlock.querySelector('.remove-btn').addEventListener('click', (e) => {
+                    if (confirm("Tem certeza que deseja remover este bloco?")) {
+                        e.target.closest(`.${type}-block`).remove();
+                        updateAllNumbers();
+                        saveFormStateToLocalStorage();
+                    }
+                });
+
+                if (type === 'test-point') {
+                    const getCoordsBtn = newBlock.querySelector('[data-action="getCoords"]');
+                    const latInput = newBlock.querySelector('[data-name="latitude"]');
+                    const lonInput = newBlock.querySelector('[data-name="longitude"]');
+                    getCoordsBtn.addEventListener('click', () => getCoordinates(latInput, lonInput, getCoordsBtn));
+                }
+                
+                container.appendChild(clone); 
+                updateAllNumbers();
+            }
+            
+            function updateAllNumbers() {
+                querySelAll('#equipments-container .equipment-block').forEach((b, i) => b.querySelector('.equipment-number').textContent = i + 1);
+                querySelAll('#test-points-container .test-point-block').forEach((b, i) => b.querySelector('.test-point-number').textContent = i + 1);
+            }
+
+            function initDynamicBlocks() {
+                 getEl('equipments-container').innerHTML = '';
+                 getEl('test-points-container').innerHTML = '';
+                 addBlock('equipment');
+                 addBlock('test-point');
+            }
+
+            function initializeSignaturePad(canvasId, inputId, clearId, nameDisplayId, nameSourceId) {
+                const canvas = getEl(canvasId), input = getEl(inputId), nameDisplay = getEl(nameDisplayId), nameSource = getEl(nameSourceId);
+                const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                canvas.width = canvas.offsetWidth * ratio;
+                canvas.height = canvas.offsetHeight * ratio;
+                const ctx = canvas.getContext('2d');
+                ctx.scale(ratio, ratio);
+                let drawing = false;
+
+                const getPos = (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    return { x: clientX - rect.left, y: clientY - rect.top };
+                };
+                const startDrawing = (e) => { e.preventDefault(); drawing = true; const pos = getPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); };
+                const draw = (e) => { if (!drawing) return; e.preventDefault(); const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.strokeStyle = '#374151'; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.stroke(); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); };
+                const stopDrawing = () => { if (!drawing) return; drawing = false; input.value = canvas.toDataURL('image/png'); saveFormStateToLocalStorage();};
+                const clearPad = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); input.value = ''; saveFormStateToLocalStorage();};
+                
+                canvas.addEventListener('mousedown', startDrawing);
+                canvas.addEventListener('mousemove', draw);
+                canvas.addEventListener('mouseup', stopDrawing);
+                canvas.addEventListener('mouseleave', stopDrawing);
+                canvas.addEventListener('touchstart', startDrawing, { passive: false });
+                canvas.addEventListener('touchmove', draw, { passive: false });
+                canvas.addEventListener('touchend', stopDrawing);
+
+                getEl(clearId).addEventListener('click', clearPad);
+                nameSource.addEventListener('input', () => { nameDisplay.textContent = nameSource.value; });
+                nameDisplay.textContent = nameSource.value;
+            }
+            
+            function handlePhotoInput(input, feedbackEl, initialFiles = []) {
+                const previewContainer = document.createElement("div");
+                previewContainer.className = "photo-preview flex flex-wrap gap-2 mt-4 no-print";
+                
+                const oldPreview = feedbackEl.nextElementSibling;
+                if (oldPreview && oldPreview.classList.contains('photo-preview')) {
+                    oldPreview.remove();
+                }
+                feedbackEl.insertAdjacentElement('afterend', previewContainer);
+
+                let fileList = [...initialFiles];
+                const MAX_FILES = 5;
+
+                const updateFileInput = () => {
+                    const dataTransfer = new DataTransfer();
+                    fileList.forEach(file => dataTransfer.items.add(file));
+                    input.files = dataTransfer.files;
+
+                    const fileCount = input.files.length;
+                    feedbackEl.textContent = fileCount === 0 ? 'Nenhuma foto selecionada.' :
+                                            fileCount === 1 ? '1 foto selecionada.' :
+                                            `${fileCount} fotos selecionadas.`;
+                };
+
+                const renderPreviews = () => {
+                    previewContainer.innerHTML = "";
+                    fileList.forEach((file, index) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const container = document.createElement("div");
+                            container.className = "relative";
+
+                            const img = document.createElement("img");
+                            img.src = e.target.result;
+                            img.className = "h-24 w-24 object-cover border rounded";
+
+                            const removeBtn = document.createElement("button");
+                            removeBtn.textContent = "✕";
+                            removeBtn.type = "button";
+                            removeBtn.className = "absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs transform translate-x-1/2 -translate-y-1/2";
+                            
+                            removeBtn.onclick = () => {
+                                fileList.splice(index, 1);
+                                updateFileInput();
+                                renderPreviews();
+                                saveFormStateToLocalStorage();
+                            };
+
+                            container.appendChild(img);
+                            container.appendChild(removeBtn);
+                            previewContainer.appendChild(container);
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                };
+
+                input.addEventListener("change", () => {
+                    const newFiles = Array.from(input.files);
+                    const combined = [...fileList, ...newFiles];
+                    
+                    if (combined.length > MAX_FILES) {
+                        alert(`Você pode selecionar no máximo ${MAX_FILES} fotos.`);
+                        fileList = combined.slice(0, MAX_FILES);
+                    } else {
+                        fileList = combined;
+                    }
+                    
+                    updateFileInput();
+                    renderPreviews();
+                    saveFormStateToLocalStorage();
+                });
+
+                updateFileInput();
+                renderPreviews();
+            }
+
+            // --- FUNÇÕES DE SALVAR/CARREGAR ARQUIVO ---
+
+            const showLoading = (text) => {
+                getEl('loading-text').textContent = text;
+                getEl('loading-overlay').classList.remove('hidden');
+            };
+
+            const hideLoading = () => {
+                getEl('loading-overlay').classList.add('hidden');
+            };
+
+            const saveProgressToFile = async () => {
+                showLoading('Coletando dados...');
+                try {
+                    const data = { staticFields: {}, equipments: [], testPoints: [], photos: {}, signatures: {} };
+
+                    querySelAll('#siteSurveyForm [name]:not([type=file])').forEach(el => {
+                        if (!el.id.includes('Signature')) {
+                           data.staticFields[el.name] = el.type === 'checkbox' ? el.checked : el.value;
+                        }
+                    });
+
+                    data.photos.infraPhotos = await Promise.all(Array.from(getEl('infraPhotos').files).map(readFileAsDataURL));
+                    data.photos.rfPhotos = await Promise.all(Array.from(getEl('rfPhotos').files).map(readFileAsDataURL));
+
+                    const equipmentPromises = Array.from(querySelAll('.equipment-block')).map(async (block) => {
+                        const itemData = { fields: {}, photos: [] };
+                        block.querySelectorAll('[data-name]').forEach(el => {
+                            if (el.type !== 'file') {
+                                itemData.fields[el.dataset.name] = el.type === 'checkbox' ? el.checked : el.value;
+                            }
+                        });
+                        const photoInput = block.querySelector('[data-name="equipmentPhotos"]');
+                        if (photoInput) {
+                            itemData.photos = await Promise.all(Array.from(photoInput.files).map(readFileAsDataURL));
+                        }
+                        return itemData;
+                    });
+                    data.equipments = await Promise.all(equipmentPromises);
+
+                    const testPointPromises = Array.from(querySelAll('.test-point-block')).map(async (block) => {
+                        const itemData = { fields: {}, photos: [] };
+                        block.querySelectorAll('[data-name]').forEach(el => {
+                            if (el.type !== 'file') {
+                                itemData.fields[el.dataset.name] = el.type === 'checkbox' ? el.checked : el.value;
+                            }
+                        });
+                        const photoInput = block.querySelector('[data-name="testPointPhotos"]');
+                        if (photoInput) {
+                            itemData.photos = await Promise.all(Array.from(photoInput.files).map(readFileAsDataURL));
+                        }
+                        return itemData;
+                    });
+                    data.testPoints = await Promise.all(testPointPromises);
+
+                    data.signatures.techSignature = getEl('techSignatureInput').value;
+                    data.signatures.clientSignature = getEl('clientSignatureInput').value;
+
+                    showLoading('Gerando arquivo...');
+                    const jsonString = JSON.stringify(data, null, 2);
+                    const blob = new Blob([jsonString], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    const fileName = getEl('docNumber').value || `SiteSurvey-Backup-${new Date().toISOString().slice(0,10)}`;
+                    a.href = url;
+                    a.download = `${fileName}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    hideLoading();
+                    alert('Progresso salvo com sucesso!');
+
+                } catch (error) {
+                    hideLoading();
+                    console.error("Erro ao salvar o progresso:", error);
+                    alert("Ocorreu um erro ao salvar o progresso. Verifique o console para detalhes.");
+                }
+            };
+
+            const loadProgressFromFile = (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                showLoading('Carregando arquivo...');
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        await restoreStateFromFileData(data);
+                        hideLoading();
+                        alert('Progresso carregado com sucesso!');
+                    } catch (error) {
+                        hideLoading();
+                        console.error("Erro ao carregar o arquivo:", error);
+                        alert("Não foi possível carregar o arquivo. Verifique se o arquivo está no formato correto e não foi corrompido.");
+                    }
+                };
+                reader.readAsText(file);
+                event.target.value = '';
+            };
+
+            const base64ToFile = (base64Data) => {
+                const byteCharacters = atob(base64Data.data.split(',')[1]);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                return new File([byteArray], base64Data.name, { type: base64Data.type });
+            };
+
+            const restoreStateFromFileData = async (data) => {
+                getEl('siteSurveyForm').reset();
+                getEl('equipments-container').innerHTML = '';
+                getEl('test-points-container').innerHTML = '';
+                
+                Object.keys(data.staticFields).forEach(name => {
+                    const el = querySel(`#siteSurveyForm [name="${name}"]`);
+                    if (el) {
+                        if (el.type === 'checkbox') {
+                            el.checked = data.staticFields[name];
+                        } else {
+                            el.value = data.staticFields[name];
+                        }
+                        el.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+
+                const infraFiles = data.photos.infraPhotos.map(base64ToFile);
+                handlePhotoInput(getEl('infraPhotos'), getEl('infraPhotos-feedback'), infraFiles);
+
+                const rfFiles = data.photos.rfPhotos.map(base64ToFile);
+                handlePhotoInput(getEl('rfPhotos'), getEl('rfPhotos-feedback'), rfFiles);
+
+                for (const eqData of data.equipments) {
+                    addBlock('equipment', eqData.fields);
+                    const newBlock = getEl('equipments-container').lastElementChild;
+                    const photoInput = newBlock.querySelector('[data-name="equipmentPhotos"]');
+                    const feedbackEl = newBlock.querySelector('[data-name="equipmentPhotos-feedback"]');
+                    const photoFiles = eqData.photos.map(base64ToFile);
+                    handlePhotoInput(photoInput, feedbackEl, photoFiles);
+                }
+
+                for (const tpData of data.testPoints) {
+                    addBlock('test-point', tpData.fields);
+                    const newBlock = getEl('test-points-container').lastElementChild;
+                    const photoInput = newBlock.querySelector('[data-name="testPointPhotos"]');
+                    const feedbackEl = newBlock.querySelector('[data-name="testPointPhotos-feedback"]');
+                    const photoFiles = tpData.photos.map(base64ToFile);
+                    handlePhotoInput(photoInput, feedbackEl, photoFiles);
+                }
+
+                const techSigInput = getEl('techSignatureInput');
+                techSigInput.value = data.signatures.techSignature || '';
+                if (techSigInput.value) {
+                    const canvas = getEl('techSignatureCanvas');
+                    const ctx = canvas.getContext('2d');
+                    const img = new Image();
+                    img.onload = () => {
+                         ctx.clearRect(0, 0, canvas.width, canvas.height);
+                         ctx.drawImage(img, 0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
+                    };
+                    img.src = techSigInput.value;
+                }
+
+                const clientSigInput = getEl('clientSignatureInput');
+                clientSigInput.value = data.signatures.clientSignature || '';
+                 if (clientSigInput.value) {
+                    const canvas = getEl('clientSignatureCanvas');
+                    const ctx = canvas.getContext('2d');
+                    const img = new Image();
+                    img.onload = () => {
+                         ctx.clearRect(0, 0, canvas.width, canvas.height);
+                         ctx.drawImage(img, 0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
+                    };
+                    img.src = clientSigInput.value;
+                }
+
+                updateHeaderData();
+                updateCompanyLogo();
+                saveFormStateToLocalStorage();
+            };
+
+            // --- FUNÇÃO DE GERAR RELATÓRIO ---
+            
+            const generateReport = async () => {
+                if (!Maps_API_KEY || Maps_API_KEY.includes("PLACEHOLDER")) {
+                    alert("Por favor, insira uma chave de API válida do Google Maps no código para gerar os mapas.");
+                    return;
+                }
+
+                showLoading('Gerando relatório...');
+                
+                const fetchImageAsBase64 = async (url) => {
+                    try {
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        const blob = await response.blob();
+                        return new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onloadend = () => resolve(reader.result);
+                            reader.onerror = reject;
+                            reader.readAsDataURL(blob);
+                        });
+                    } catch (error) {
+                        console.error('Falha ao buscar imagem do mapa:', error, 'URL:', url);
+                        return null;
+                    }
+                };
+
+                try {
+                    const createRow = (label, value) => `<tr class="border-b"><td class="font-bold p-2 align-top w-1/3">${label}</td><td class="p-2">${String(value || 'N/A').replace(/\n/g, '<br>')}</td></tr>`;
+                    
+                    let reportHtml = `<div class="p-8 bg-white">`;
+
+                    const selectedCompanyKey = getEl('company').value;
+                    const selectedCompany = companyData[selectedCompanyKey];
+                    const logoSrc = selectedCompany.logo;
+
+                    reportHtml += `<header class="report-header bg-white p-0 overflow-hidden border border-gray-400 rounded-lg mb-6"><table class="w-full"><tbody><tr class="divide-x divide-gray-300"><td class="w-1/3 p-2 align-middle text-center"><img src="${logoSrc}" alt="Logo da Empresa" style="max-height: 50px; margin: 0 auto;"></td><td class="w-1/3 p-2 align-middle text-center"><h1 class="text-2xl font-bold text-gray-800 uppercase">Site Survey</h1></td><td class="w-1/3 p-2 align-middle text-center font-semibold text-lg">${getEl('docDate').textContent}</td></tr></tbody></table></header>`;
+
+                    reportHtml += `<div class="report-section mt-6"><h2 class="text-xl font-bold mb-2 border-b pb-2">Empresa Executora</h2><table class="w-full text-sm">`;
+                    reportHtml += createRow('Nome', selectedCompany.name);
+                    reportHtml += createRow('CNPJ', selectedCompany.cnpj);
+                    reportHtml += createRow('Endereço', selectedCompany.address);
+                    reportHtml += `</table></div>`;
+
+                    reportHtml += `<div class="report-section mt-6"><h2 class="text-xl font-bold mb-2 border-b pb-2">1. Informações Gerais</h2><table class="w-full text-sm">`;
+                    reportHtml += createRow('Nº do Documento', getEl('docNumber').value);
+                    reportHtml += createRow('Data da Visita', getEl('docDate').textContent);
+                    reportHtml += createRow('Nome do Site', getEl('siteName').value);
+                    reportHtml += createRow('Técnico Responsável', getEl('surveyorName').value);
+                    reportHtml += createRow('Cliente', getEl('clientName').value);
+                    reportHtml += createRow('Contato do Cliente', getEl('clientContact').value);
+                    reportHtml += `</table></div>`;
+
+                    reportHtml += `<div class="report-section mt-6"><h2 class="text-xl font-bold mb-2 border-b pb-2">2. Localização e Infraestrutura</h2><table class="w-full text-sm">`;
+                    reportHtml += createRow('Endereço', getEl('address').value);
+                    reportHtml += createRow('Coordenadas', `${getEl('latitude').value}, ${getEl('longitude').value}`);
+                    reportHtml += createRow('Energia Principal', getEl('powerSource').options[getEl('powerSource').selectedIndex].text);
+                    reportHtml += createRow('Voltagem Medida', `${getEl('voltage').value} V`);
+                    if (getEl('hasRedundantPower').checked) {
+                       reportHtml += createRow('Energia Redundante', getEl('redundantPowerSource').options[getEl('redundantPowerSource').selectedIndex].text);
+                    }
+                    reportHtml += createRow('Aterramento', `${getEl('grounding').options[getEl('grounding').selectedIndex].text} (${getEl('groundingMeasurement').value} Ω)`);
+                    reportHtml += createRow('Tipo de Abrigo', getEl('shelterType').options[getEl('shelterType').selectedIndex].text);
+                    reportHtml += createRow('Espaço p/ Equip.', getEl('equipmentSpace').value);
+                    reportHtml += `</table>`;
+
+                    const mainLat = getEl('latitude').value;
+                    const mainLon = getEl('longitude').value;
+                    if (mainLat && mainLon) {
+                        const mapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${mainLat},${mainLon}&zoom=17&size=800x400&maptype=satellite&markers=color:red%7Clabel:S%7C${mainLat},${mainLon}&key=${Maps_API_KEY}`;
+                        const mapBase64 = await fetchImageAsBase64(mapUrl);
+                        if (mapBase64) {
+                            reportHtml += `<h4 class="font-semibold mt-4 mb-2 text-gray-700">Localização Principal do Site</h4><div class="report-map-gallery"><img src="${mapBase64}" alt="Mapa da localização principal"></div>`;
+                        } else {
+                            reportHtml += `<p class="text-red-500 text-sm mt-2">Não foi possível carregar o mapa. Verifique a chave de API, a conexão ou as coordenadas.</p>`;
+                        }
+                    }
+
+                    reportHtml += `<h3 class="font-semibold mt-4 text-gray-700">Estrutura da Antena</h3><table class="w-full text-sm mt-2">`;
+                    reportHtml += createRow('Tipo', getEl('antennaStructureType').options[getEl('antennaStructureType').selectedIndex].text);
+                    reportHtml += createRow('Altura da Estrutura', `${getEl('structureHeight').value} m`);
+                    reportHtml += createRow('Condição', getEl('antennaStructureCondition').options[getEl('antennaStructureCondition').selectedIndex].text);
+                    reportHtml += createRow('Linha de Vida', getEl('lifeline').options[getEl('lifeline').selectedIndex].text);
+                    reportHtml += createRow('Balizamento', getEl('beaconing').options[getEl('beaconing').selectedIndex].text);
+                    reportHtml += createRow('Observações', getEl('structureObs').value);
+                    reportHtml += `</table>`;
+                    const infraFiles = getEl('infraPhotos').files;
+                    if (infraFiles.length > 0) {
+                        reportHtml += `<h4 class="font-semibold mt-4 mb-2 text-gray-700">Fotos da Infraestrutura</h4><div class="report-photo-gallery">`;
+                        const infraImages = await Promise.all(Array.from(infraFiles).map(file => readFileAsDataURL(file).then(d => d.data)));
+                        infraImages.forEach(src => reportHtml += `<img src="${src}">`);
+                        reportHtml += `</div>`;
+                    }
+                    reportHtml += `</div>`;
+                    
+                    reportHtml += `<div class="report-section mt-6"><h2 class="text-xl font-bold mb-2 border-b pb-2">3. Análise de RF do Ambiente</h2><table class="w-full text-sm">`;
+                    reportHtml += createRow('Banda de Varredura', getEl('frequencyBand').value);
+                    reportHtml += createRow('Noise Floor (dBm)', getEl('noiseFloor').value);
+                    reportHtml += createRow('Interferências', getEl('interferenceNotes').value);
+                    reportHtml += `</table>`;
+                    const rfFiles = getEl('rfPhotos').files;
+                    if (rfFiles.length > 0) {
+                        reportHtml += `<h4 class="font-semibold mt-4 mb-2 text-gray-700">Fotos da Análise de RF</h4><div class="report-photo-gallery">`;
+                        const rfImages = await Promise.all(Array.from(rfFiles).map(file => readFileAsDataURL(file).then(d => d.data)));
+                        rfImages.forEach(src => reportHtml += `<img src="${src}">`);
+                        reportHtml += `</div>`;
+                    }
+                    reportHtml += `</div>`;
+
+                    reportHtml += `<div class="report-section mt-6"><h2 class="text-xl font-bold mb-2 border-b pb-2">4. Análise de Equipamentos</h2>`;
+                    for (const [index, block] of querySelAll('#equipments-container .equipment-block').entries()) {
+                        reportHtml += `<div class="mt-4 pt-4 border-t"><h3 class="font-bold text-lg text-blue-700">Equipamento ${index + 1}</h3><table class="w-full text-sm mt-2">`;
+                        const equipmentTypeSelect = block.querySelector('[data-name="equipmentType"]');
+                        reportHtml += createRow('Tipo', equipmentTypeSelect.options[equipmentTypeSelect.selectedIndex].text);
+                        reportHtml += createRow('ID/Nome', block.querySelector('[data-name="equipmentName"]').value);
+                        reportHtml += createRow('Modelo', block.querySelector('[data-name="model"]').value);
+                        reportHtml += createRow('Nº Série', block.querySelector('[data-name="serialNumber"]').value);
+                        reportHtml += createRow('Antena', `${block.querySelector('[data-name="antennaType"]').value} @ ${block.querySelector('[data-name="antennaHeight"]').value}m`);
+                        reportHtml += createRow('Cabo', `${block.querySelector('[data-name="cableType"]').value} (${block.querySelector('[data-name="cableLength"]').value}m)`);
+                        reportHtml += createRow('Frequências (TX/RX)', `${block.querySelector('[data-name="txFreq"]').value} / ${block.querySelector('[data-name="rxFreq"]').value} MHz`);
+                        reportHtml += createRow('Potência (Direta/Refletida)', `${block.querySelector('[data-name="power"]').value}W / ${block.querySelector('[data-name="reflectedPower"]').value}W`);
+                        reportHtml += createRow('ROE/VSWR', block.querySelector('[data-name="vswr"]').value);
+                        const hasPowerSupply = block.querySelector('[data-name="hasPowerSupply"]').checked;
+                        if (hasPowerSupply) {
+                            const psVoltage = block.querySelector('[data-name="powerSupplyVoltage"]').value;
+                            reportHtml += createRow('Alimentação Dedicada', `Sim (${psVoltage || 'N/A'} V)`);
+                        } else {
+                            reportHtml += createRow('Alimentação Dedicada', 'Não');
+                        }
+                        reportHtml += createRow('Observações', block.querySelector('[data-name="equipmentObs"]').value);
+                        reportHtml += `</table>`;
+                        const equipmentFiles = block.querySelector('[data-name="equipmentPhotos"]').files;
+                        if(equipmentFiles.length > 0) {
+                            reportHtml += `<h4 class="font-semibold mt-4 mb-2 text-gray-700">Fotos do Equipamento ${index+1}</h4><div class="report-photo-gallery">`;
+                            const equipmentImages = await Promise.all(Array.from(equipmentFiles).map(file => readFileAsDataURL(file).then(d => d.data)));
+                            equipmentImages.forEach(src => reportHtml += `<img src="${src}">`);
+                            reportHtml += `</div>`;
+                        }
+                        reportHtml += `</div>`;
+                    }
+                    reportHtml += `</div>`;
+
+                    reportHtml += `<div class="report-section mt-6"><h2 class="text-xl font-bold mb-2 border-b pb-2">5. Teste de Campo</h2>`;
+                    for (const [index, block] of querySelAll('#test-points-container .test-point-block').entries()) {
+                        const lat = block.querySelector('[data-name="latitude"]').value;
+                        const lon = block.querySelector('[data-name="longitude"]').value;
+
+                        reportHtml += `<div class="mt-4 pt-4 border-t"><h3 class="font-bold text-lg text-green-700">Ponto de Teste ${index + 1}: ${block.querySelector('[data-name="location"]').value}</h3><table class="w-full text-sm mt-2">`;
+                        reportHtml += createRow('Coordenadas', lat && lon ? `${lat}, ${lon}` : 'N/A');
+                        
+                        const radioTypeSelect = block.querySelector('[data-name="testRadioType"]');
+                        reportHtml += createRow('Rádio de Teste', radioTypeSelect.options[radioTypeSelect.selectedIndex].text);
+                        reportHtml += createRow('Potência do Rádio', `${block.querySelector('[data-name="testRadioPower"]').value} W`);
+                        reportHtml += createRow('Antena do Rádio', block.querySelector('[data-name="testRadioAntenna"]').value);
+
+                        reportHtml += createRow('Qualidade Áudio (MOS)', block.querySelector('[data-name="audioQuality"]').value);
+                        reportHtml += createRow('RSSI (dBm)', block.querySelector('[data-name="rssi"]').value);
+                        reportHtml += createRow('BER (%)', block.querySelector('[data-name="ber"]').value);
+                        const commDuplex = block.querySelector('[data-name="comm_duplex"]').checked ? 'Rádio-Repetidora' : '';
+                        const commSimplex = block.querySelector('[data-name="comm_simplex"]').checked ? 'Rádio-Rádio' : '';
+                        reportHtml += createRow('Comunicação Testada', [commDuplex, commSimplex].filter(Boolean).join(', '));
+                        reportHtml += createRow('Observações', block.querySelector('[data-name="notes"]').value);
+                        reportHtml += `</table>`;
+                        
+                        if (lat && lon) {
+                            const mapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lon}&zoom=17&size=800x400&maptype=satellite&markers=color:blue%7Clabel:P%7C${lat},${lon}&key=${Maps_API_KEY}`;
+                            const mapBase64 = await fetchImageAsBase64(mapUrl);
+                            if(mapBase64) {
+                                reportHtml += `<h4 class="font-semibold mt-4 mb-2 text-gray-700">Localização do Ponto de Teste ${index+1}</h4><div class="report-map-gallery"><img src="${mapBase64}" alt="Mapa do ponto de teste"></div>`;
+                            } else {
+                                reportHtml += `<p class="text-red-500 text-sm mt-2">Não foi possível carregar o mapa para o ponto de teste ${index + 1}.</p>`;
+                            }
+                        }
+
+                        const testPointFiles = block.querySelector('[data-name="testPointPhotos"]').files;
+                         if(testPointFiles.length > 0) {
+                            reportHtml += `<h4 class="font-semibold mt-4 mb-2 text-gray-700">Fotos do Ponto de Teste ${index+1}</h4><div class="report-photo-gallery">`;
+                            const testImages = await Promise.all(Array.from(testPointFiles).map(file => readFileAsDataURL(file).then(d => d.data)));
+                            testImages.forEach(src => reportHtml += `<img src="${src}">`);
+                            reportHtml += `</div>`;
+                        }
+                        reportHtml += `</div>`;
+                    }
+                    reportHtml += `</div>`;
+                    
+                    reportHtml += `<div class="report-section mt-6"><h2 class="text-xl font-bold mb-2 border-b pb-2">6. Observações Gerais e Recomendações</h2><p class="text-sm p-2">${getEl('observations').value || 'N/A'}</p></div>`;
+                    
+                    reportHtml += `<div class="report-section mt-6"><h2 class="text-xl font-bold mb-2 border-b pb-2">7. Assinaturas</h2><div class="flex justify-around items-end pt-8">`;
+                    reportHtml += `<div class="text-center w-2/5">
+                    ${getEl('techSignatureInput').value ?
+                    `<img src="${getEl('techSignatureInput').value}" class="h-20 mx-auto">` :
+                    '<p class="text-red-500 text-sm py-8">[ Sem assinatura ]</p>'}
+                    <p class="border-t mt-2 pt-1 text-sm">${getEl('surveyorName').value || 'Técnico não informado'}</p><p class="text-xs font-bold">Técnico Responsável</p></div>`;
+                    reportHtml += `<div class="text-center w-2/5">
+                    ${getEl('clientSignatureInput').value ?
+                    `<img src="${getEl('clientSignatureInput').value}" class="h-20 mx-auto">` :
+                    '<p class="text-red-500 text-sm py-8">[ Sem assinatura ]</p>'}
+                    <p class="border-t mt-2 pt-1 text-sm">${getEl('clientContact').value || 'Cliente não informado'}</p><p class="text-xs font-bold">Cliente</p></div>`;
+                    reportHtml += `</div></div>`;
+
+                    reportHtml += `</div>`;
+
+                    getEl('print-output').innerHTML = reportHtml;
+                    hideLoading();
+                    
+                    setTimeout(() => {
+                        window.print();
+                    }, 500);
+
+                } catch (error) {
+                    console.error("Erro ao gerar o relatório:", error);
+                    alert("Ocorreu um erro ao processar as imagens para o relatório. Verifique o console para mais detalhes.");
+                    hideLoading();
+                }
+            };
+            
+            // --- EVENT LISTENERS ---
+            getEl('getCoordsBtn').addEventListener('click', () => getCoordinates(getEl('latitude'), getEl('longitude'), getEl('getCoordsBtn')));
+            getEl('surveyDate').addEventListener('change', updateHeaderData);
+            getEl('company').addEventListener('change', updateCompanyLogo);
+            getEl('hasRedundantPower').addEventListener('change', (e) => {
+                getEl('redundantPowerSection').classList.toggle('hidden', !e.target.checked);
+            });
+            getEl('clearFormBtn').addEventListener('click', () => {
+                if (confirm('Tem a certeza que quer limpar todos os dados do formulário? Esta ação não pode ser desfeita.')) {
+                    localStorage.removeItem(FORM_STORAGE_KEY);
+                    window.location.reload();
+                }
+            });
+            getEl('add-equipment-btn').addEventListener('click', () => addBlock('equipment'));
+            getEl('add-test-point-btn').addEventListener('click', () => addBlock('test-point'));
+            querySel('#siteSurveyForm').addEventListener('input', saveFormStateToLocalStorage);
+            querySel('#siteSurveyForm').addEventListener('change', saveFormStateToLocalStorage);
+            
+            getEl('saveProgressBtn').addEventListener('click', saveProgressToFile);
+            getEl('loadProgressBtn').addEventListener('click', () => getEl('loadProgressInput').click());
+            getEl('loadProgressInput').addEventListener('change', loadProgressFromFile);
+            
+            getEl('generateReportBtn').addEventListener('click', generateReport);
+            
+            // --- INICIALIZAÇÃO ---
+            handlePhotoInput(getEl('infraPhotos'), getEl('infraPhotos-feedback'));
+            handlePhotoInput(getEl('rfPhotos'), getEl('rfPhotos-feedback'));
+
+            initializeSignaturePad('techSignatureCanvas', 'techSignatureInput', 'clearTechSignature', 'techNameDisplay', 'surveyorName');
+            initializeSignaturePad('clientSignatureCanvas', 'clientSignatureInput', 'clearClientSignature', 'clientNameDisplay', 'clientContact');
+            
+            loadFormStateFromLocalStorage();
+        });
+    </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registrado com sucesso:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Falha ao registrar o Service Worker:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

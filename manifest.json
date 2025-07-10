@@ -1,0 +1,21 @@
+{
+  "name": "Relatório de Site Survey - Tecpoint-ARSA",
+  "short_name": "TecSurvey",
+  "start_url": "tecsurvey.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563EB",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
